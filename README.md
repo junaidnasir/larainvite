@@ -38,7 +38,7 @@ php artisan vendor:publish"
 migrate to create `user_invitation` table
 
 ```bash
-php artisan migrate"
+php artisan migrate
 ```
 
 
@@ -49,10 +49,11 @@ You can use ***facade accessor*** to retrieve the package controller. Examples:
 
 ```php
 $user = Auth::user();
-//Invite::invite(EMAIL,REFERRAL_ID); 
-$refCode = Invite::invite('email@address.com',$user->id);
+//Invite::invite(EMAIL, REFERRAL_ID); 
+$refCode = Invite::invite('email@address.com', $user->id);
 //or 
-$refCode = Invite::invite('email@address.com',$user->id,'2016-12-31 10:00:00');
+//Invite::invite(EMAIL, REFERRAL_ID, EXPIRATION); 
+$refCode = Invite::invite('email@address.com', $user->id, '2016-12-31 10:00:00');
 ```
 
 now create routes with `refCode`, when user access that route you can use following methods
@@ -75,12 +76,25 @@ if( Invite::isValid($code))
 
 ## Events
 
-***larainvite*** fires several events
+***larainvite*** fires several [events](https://laravel.com/docs/master/events)
 
+*  'junaidnasir.larainvite.invited' 
+*  'junaidnasir.larainvite.consumed' 
+*  'junaidnasir.larainvite.canceled' 
+*  'junaidnasir.larainvite.expired' 
+
+all of these events incloses `invitation modal` so you can listen to these event like
+
+```php
+public function handle($invitation)
+{
+    \Mail::queue('invitations.emailBody', $data, function ($m) use ($data) {
+            $m->from('From Address', 'Your App Name');
+            $m->to($invitation->email);
+            $m->subject("You have been invited by ". $invitation->user->name);
+        });
+}
 ```
-
-```
-
 
 ## Configurations
 

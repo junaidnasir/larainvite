@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "junaidnasir\\larainvite\\": "src/"
+            "Junaidnasir\\Larainvite\\": "src"
         }
     },
     "autoload-dev": {

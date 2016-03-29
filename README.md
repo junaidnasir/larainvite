@@ -3,6 +3,7 @@ User (signup) invitation package for laravel
 
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/junaidnasir/larainvite/master/LICENSE.txt)
+[![Total Downloads](https://poser.pugx.org/junaidnasir/larainvite/downloads)](https://packagist.org/packages/junaidnasir/larainvite)
 
 larainvite is a ***laravel*** package, to allow existing users to invite others by email.
 

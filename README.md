@@ -42,6 +42,13 @@ migrate to create `user_invitation` table
 php artisan migrate
 ```
 
+edit your `User` model to include `larainviteTrait`
+```php
+use Junaidnasir\Larainvite\InviteTrait;
+class user ... {
+    use InviteTrait;
+}
+```
 
 
 ## Usage
@@ -74,7 +81,12 @@ if( Invite::isValid($code))
     // show error or show simple signup form
 }
 ```
-
+with help of new trait you have access to invitations sent by user
+```php
+$user= User::find(1);
+$invitations = $user->invitations;
+$count = $user->invitations()->count();
+```
 ## Events
 
 ***larainvite*** fires several [events](https://laravel.com/docs/master/events)
@@ -84,8 +96,16 @@ if( Invite::isValid($code))
 *  'junaidnasir.larainvite.canceled' 
 *  'junaidnasir.larainvite.expired' 
 
-all of these events incloses `invitation modal` so you can listen to these event like
-
+all of these events incloses `invitation modal` so you can listen to these events.
+include listener in `EventServiceProvider.php`
+```php
+protected $listen = [
+    'junaidnasir.larainvite.invited' => [
+        'App\Listeners\userInvite',
+    ],
+];
+```
+`userInvite.php`
 ```php
 public function handle($invitation)
 {

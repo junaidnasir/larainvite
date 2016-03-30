@@ -66,6 +66,7 @@ $refCode = Invite::invite('email@address.com', $user->id, '2016-12-31 10:00:00')
 
 now create routes with `refCode`, when user access that route you can use following methods
 ```php
+// Get route
 $code = Request::input('code');
 if( Invite::isValid($code))
 {
@@ -74,11 +75,20 @@ if( Invite::isValid($code))
     $referral_user = $invitation->user;
 
     // show signup form
-    
-    Invite::consume($code);
 } else {
     $status = Invite::status($code);
     // show error or show simple signup form
+}
+```
+```php
+// Post route
+$code = Request::input('code');
+$email = Request::input('signup_email');
+if( Invite::isAllowed($code,$email) ){
+    // Register this user
+    Invite::consume($code);
+} else {
+    // either refCode is inavalid, or provided email was not invited against this refCode
 }
 ```
 with help of new trait you have access to invitations sent by user

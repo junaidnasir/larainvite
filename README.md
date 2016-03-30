@@ -125,10 +125,7 @@ in `config/larainvite.php` you can set default expiration time in hours from cur
 'expires' => 48
 ```
 
-to change user model, default set to ('App\User') add this in your `AppServiceProvider.php` boot function 
+you can also change user model to be used, in `larainvite.php`
 ```php
-public function boot()
-{
-    Invite::setUserModel('App\Models\User');
-}
+'UserModel' => 'App\User'
 ```

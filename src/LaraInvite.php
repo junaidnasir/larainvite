@@ -140,6 +140,14 @@ class LaraInvite implements invitationInterface
     {
         return ($this->instance->status == 'pending') ? true : false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowed($email)
+    {
+        return (($this->instance->email == $email) && $this->isValid());
+    }
     
     /**
      * Fire junaidnasir.larainvite.invited again for the invitation

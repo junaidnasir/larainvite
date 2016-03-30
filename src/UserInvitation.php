@@ -47,6 +47,10 @@ class UserInvitation
         return $this->interface->setCode($code)->isPending();
     }
 
+    public function isAllowed($code,$email)
+    {
+        return $this->interface->setCode($code)->isAllowed($email);
+    }
     public function consume($code)
     {
         return $this->interface->setCode($code)->consume();

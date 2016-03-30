@@ -60,4 +60,10 @@ interface InvitationInterface
      * @return boolean
      */
     public function isPending();
+
+    /**
+     * check if given token is valid and given email is allowed
+     * @return boolean
+     */
+    public function isAllowed($email);
 }

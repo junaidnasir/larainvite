@@ -102,7 +102,7 @@ class LaraInvite implements invitationInterface
      */
     public function cancel()
     {
-        if ($this->isPending()) {
+        if ($this->isValid()) {
             $this->instance->status = 'canceled';
             $this->instance->save();
             $this->publishEvent('canceled');
@@ -194,7 +194,8 @@ class LaraInvite implements invitationInterface
      */
     private function getModelInstance($allowNew = true)
     {
-        if (is_null($this->code) && $allowNew) {
+        //if (is_null($this->code) && $allowNew) {
+        if ($allowNew) {
             $this->instance = new static::$model;
             return $this;
         }

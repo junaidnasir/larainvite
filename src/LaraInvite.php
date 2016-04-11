@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 /**
 *   Laravel Invitation class
 */
-class LaraInvite implements invitationInterface
+class LaraInvite implements InvitationInterface
 {
     /**
      * Invitation Model

@@ -7,7 +7,7 @@ interface InvitationInterface
     /**
      * Create new invitation
      * @param  string   $email      Email to invite
-     * @param  int      $referral   Referral 
+     * @param  int      $referral   Referral
      * @param  DateTime $expires    Expiration Date Time
      * @return string               Referral code
      */

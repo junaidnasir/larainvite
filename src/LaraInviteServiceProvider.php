@@ -14,7 +14,7 @@ class LaraInviteServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/config/larainvite.php' => config_path('larainvite.php'),
+            __DIR__.'/Config/larainvite.php' => config_path('larainvite.php'),
         ], 'config');
         $this->publishes([
             __DIR__.'/Migrations/' => base_path('/database/migrations')
@@ -29,7 +29,7 @@ class LaraInviteServiceProvider extends ServiceProvider
     public function register()
     {
 
-        $this->mergeConfigFrom( __DIR__.'/config/larainvite.php', 'larainvite');
+        $this->mergeConfigFrom(__DIR__.'/Config/larainvite.php', 'larainvite');
         $this->app->singleton('invite', function ($app) {
             $laravelImplementation = new \Junaidnasir\Larainvite\LaraInvite();
             return new \Junaidnasir\Larainvite\UserInvitation($laravelImplementation);

@@ -119,7 +119,7 @@ protected $listen = [
 ```php
 public function handle($invitation)
 {
-    \Mail::queue('invitations.emailBody', $data, function ($m) use ($data) {
+    \Mail::queue('invitations.emailBody', $invitation, function ($m) use ($invitation) {
             $m->from('From Address', 'Your App Name');
             $m->to($invitation->email);
             $m->subject("You have been invited by ". $invitation->user->name);

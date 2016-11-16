@@ -10,7 +10,7 @@ trait InviteTrait
      */
     public function invitations()
     {
-        return $this->hasMany('Junaidnasir\Larainvite\Models\LaraInviteModel');
+        return $this->hasMany(config('larainvite.InvitationModel'));
     }
 
     /**

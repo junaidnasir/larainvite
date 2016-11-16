@@ -9,13 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 *   Laravel Invitation class
 */
 class LaraInvite implements InvitationInterface
-{
-    /**
-     * Invitation Model
-     * @var string
-     */
-    protected static $model = 'Junaidnasir\Larainvite\Models\LaraInviteModel';
-    
+{  
     /**
      * Email address to invite
      * @var string
@@ -49,10 +43,10 @@ class LaraInvite implements InvitationInterface
     /**
      * {@inheritdoc}
      */
-    public function invite($email, $referral, $expires)
+    public function invite($email, $referral, $expires, $beforeSave = null)
     {
         $this->readyPayload($email, $referral, $expires)
-             ->createInvite()
+             ->createInvite($beforeSave)
              ->publishEvent('invited');
         return $this->code;
     }
@@ -163,10 +157,10 @@ class LaraInvite implements InvitationInterface
      * generate invitation code and call save
      * @return self
      */
-    private function createInvite()
+    private function createInvite($beforeSave = null)
     {
         $code = md5(uniqid());
-        return $this->save($code);
+        return $this->save($code, $beforeSave);
     }
 
     /**
@@ -174,13 +168,21 @@ class LaraInvite implements InvitationInterface
      * @param  string $code referral code
      * @return self
      */
-    private function save($code)
+    private function save($code, $beforeSave = null)
     {
         $this->getModelInstance();
         $this->instance->email      = $this->email;
         $this->instance->user_id    = $this->referral;
         $this->instance->valid_till = $this->expires;
         $this->instance->code       = $code;
+
+        if (!is_null($beforeSave)) {
+            if ($beforeSave instanceof Closure) {
+                $beforeSave->call($this->instance);
+            } else if (is_callable($beforeSave)) {
+                call_user_func($beforeSave, $this->instance);
+            }
+        }
         $this->instance->save();
 
         $this->code = $code;
@@ -194,13 +196,14 @@ class LaraInvite implements InvitationInterface
      */
     private function getModelInstance($allowNew = true)
     {
+        $model = config('larainvite.InvitationModel');
         //if (is_null($this->code) && $allowNew) {
         if ($allowNew) {
-            $this->instance = new static::$model;
+            $this->instance = new $model;
             return $this;
         }
         try {
-            $this->instance = (new static::$model)->where('code', $this->code)->firstOrFail();
+            $this->instance = (new $model)->where('code', $this->code)->firstOrFail();
             return $this;
         } catch (ModelNotFoundException $e) {
             throw new Exception("Invalid Token {$this->code}", 1);

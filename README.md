@@ -33,7 +33,7 @@ you may add the facade access in the aliases array:
 publish the migration and config file:
 
 ```bash
-php artisan vendor:publish"
+php artisan vendor:publish --provider="Junaidnasir\Larainvite\LaraInviteServiceProvider"
 ```
 
 migrate to create `user_invitation` table

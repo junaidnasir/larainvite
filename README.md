@@ -62,6 +62,12 @@ $refCode = Invite::invite('email@address.com', $user->id);
 //or 
 //Invite::invite(EMAIL, REFERRAL_ID, EXPIRATION); 
 $refCode = Invite::invite('email@address.com', $user->id, '2016-12-31 10:00:00');
+//or
+//Invite::invite(EMAIL, REFERRAL_ID, EXPIRATION, BEFORE_SAVE_CALLBACK); 
+$refCode = Invite::invite($to, Auth::user()->id, Carbon::now()->addYear(1),
+                      function(/* InvitationModel, see Configurations */ $invitation) use ($someValue) {
+      $invitation->someParam = $someValue;
+});
 ```
 
 now create routes with `refCode`, when user access that route you can use following methods
@@ -138,4 +144,9 @@ in `config/larainvite.php` you can set default expiration time in hours from cur
 you can also change user model to be used, in `larainvite.php`
 ```php
 'UserModel' => 'App\User'
+```
+
+you can also change invitation model to be used, in `larainvite.php`
+```php
+'InvitationModel' => 'App\Invitation'
 ```

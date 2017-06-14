@@ -4,6 +4,7 @@ use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Junaidnasir\Larainvite\Exceptions\InvalidTokenException;
 
 /**
 *   Laravel Invitation class
@@ -206,7 +207,7 @@ class LaraInvite implements InvitationInterface
             $this->instance = (new $model)->where('code', $this->code)->firstOrFail();
             return $this;
         } catch (ModelNotFoundException $e) {
-            throw new Exception("Invalid Token {$this->code}", 1);
+            throw new InvalidTokenException("Invalid Token {$this->code}", 401);
         }
     }
 

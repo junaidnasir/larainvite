@@ -10,7 +10,8 @@ use Junaidnasir\Larainvite\Exceptions\InvalidTokenException;
 *   Laravel Invitation class
 */
 class LaraInvite implements InvitationInterface
-{  
+{
+
     /**
      * Email address to invite
      * @var string
@@ -22,6 +23,12 @@ class LaraInvite implements InvitationInterface
      * @var string
      */
     private $code = null;
+
+    /**
+     * Status of code existing in DB
+     * @var bool
+     */
+    private $exist = false;
 
     /**
      * integer ID of referral
@@ -58,7 +65,12 @@ class LaraInvite implements InvitationInterface
     public function setCode($code)
     {
         $this->code = $code;
-        $this->getModelInstance(false);
+        try {
+            $this->getModelInstance(false);
+        } catch (InvalidTokenException $exception) {
+            // handle invalid codes
+            $this->exist = false;
+        }
         return $this;
     }
     
@@ -70,12 +82,15 @@ class LaraInvite implements InvitationInterface
         return $this->instance;
     }
 
-        /**
+    /**
      * {@inheritdoc}
      */
     public function status()
     {
-        return $this->instance->status;
+        if ($this->isValid()) {
+            return $this->instance->status;
+        }
+        return 'Invalid';
     }
     
     /**
@@ -105,6 +120,14 @@ class LaraInvite implements InvitationInterface
         }
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isExisting()
+    {
+        return $this->exist;
+    }
     
     /**
      * {@inheritdoc}
@@ -119,6 +142,9 @@ class LaraInvite implements InvitationInterface
      */
     public function isExpired()
     {
+        if (!$this->isExisting()) {
+            return true;
+        }
         if (strtotime($this->instance->valid_till) >= time()) {
             return false;
         }
@@ -133,6 +159,9 @@ class LaraInvite implements InvitationInterface
      */
     public function isPending()
     {
+        if (!$this->isExisting()) {
+            return false;
+        }
         return ($this->instance->status == 'pending') ? true : false;
     }
 
@@ -141,7 +170,7 @@ class LaraInvite implements InvitationInterface
      */
     public function isAllowed($email)
     {
-        return (($this->instance->email == $email) && $this->isValid());
+        return ($this->isValid() && ($this->instance->email == $email));
     }
     
     /**
@@ -180,13 +209,14 @@ class LaraInvite implements InvitationInterface
         if (!is_null($beforeSave)) {
             if ($beforeSave instanceof Closure) {
                 $beforeSave->call($this->instance);
-            } else if (is_callable($beforeSave)) {
+            } elseif (is_callable($beforeSave)) {
                 call_user_func($beforeSave, $this->instance);
             }
         }
         $this->instance->save();
 
         $this->code = $code;
+        $this->exist = true;
         return $this;
     }
 
@@ -205,6 +235,7 @@ class LaraInvite implements InvitationInterface
         }
         try {
             $this->instance = (new $model)->where('code', $this->code)->firstOrFail();
+            $this->exist = true;
             return $this;
         } catch (ModelNotFoundException $e) {
             throw new InvalidTokenException("Invalid Token {$this->code}", 401);

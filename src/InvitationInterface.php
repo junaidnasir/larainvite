@@ -44,6 +44,13 @@ interface InvitationInterface
     public function cancel();
 
     /**
+     * check if a code exist
+     *
+     * @return boolean true if code found | false if not
+     */
+    public function isExisting();
+
+    /**
      * check if invitation is valid
      * @return boolean
      */

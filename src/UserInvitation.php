@@ -2,7 +2,7 @@
 
 use \Exception;
 use Carbon\Carbon;
-use Junaidnasir\Larainvite\invitationInterface;
+use Junaidnasir\Larainvite\InvitationInterface;
 
 /**
 * User Invitation class
@@ -10,7 +10,7 @@ use Junaidnasir\Larainvite\invitationInterface;
 class UserInvitation
 {
     private $interface;
-    function __construct(invitationInterface $interface)
+    function __construct(InvitationInterface $interface)
     {
         $this->interface = $interface;
     }

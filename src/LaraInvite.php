@@ -264,7 +264,7 @@ class LaraInvite implements InvitationInterface
      */
     private function publishEvent($event)
     {
-        Event::fire('junaidnasir.larainvite.'.$event, $this->instance, false);
+        Event::dispatch('junaidnasir.larainvite.'.$event, $this->instance, false);
         return $this;
     }
 }

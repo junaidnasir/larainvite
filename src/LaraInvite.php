@@ -179,7 +179,7 @@ class LaraInvite implements InvitationInterface
      */
     public function reminder()
     {
-        Event::fire('junaidnasir.larainvite.invited', $this->instance, false);
+        Event::dispatch('junaidnasir.larainvite.invited', $this->instance, false);
         return true;
     }
 

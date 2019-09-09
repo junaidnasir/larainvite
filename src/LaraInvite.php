@@ -162,7 +162,7 @@ class LaraInvite implements InvitationInterface
         if (!$this->isExisting()) {
             return false;
         }
-        return ($this->instance->status == 'pending') ? true : false;
+        return ($this->instance->status === 'pending') ? true : false;
     }
 
     /**
@@ -170,7 +170,7 @@ class LaraInvite implements InvitationInterface
      */
     public function isAllowed($email)
     {
-        return ($this->isValid() && ($this->instance->email == $email));
+        return ($this->isValid() && ($this->instance->email === $email));
     }
     
     /**
@@ -179,24 +179,28 @@ class LaraInvite implements InvitationInterface
      */
     public function reminder()
     {
-        Event::fire('junaidnasir.larainvite.invited', $this->instance, false);
+        Event::dispatch('junaidnasir.larainvite.invited', $this->instance, false);
         return true;
     }
 
     /**
      * generate invitation code and call save
+     * @param null $beforeSave
      * @return self
+     * @throws InvalidTokenException
      */
     private function createInvite($beforeSave = null)
     {
-        $code = md5(uniqid());
+        $code = md5(uniqid('', true));
         return $this->save($code, $beforeSave);
     }
 
     /**
      * saves invitation in DB
-     * @param  string $code referral code
+     * @param string $code referral code
+     * @param null $beforeSave
      * @return self
+     * @throws InvalidTokenException
      */
     private function save($code, $beforeSave = null)
     {
@@ -206,11 +210,11 @@ class LaraInvite implements InvitationInterface
         $this->instance->valid_till = $this->expires;
         $this->instance->code       = $code;
 
-        if (!is_null($beforeSave)) {
+        if ($beforeSave !== null) {
             if ($beforeSave instanceof Closure) {
                 $beforeSave->call($this->instance);
             } elseif (is_callable($beforeSave)) {
-                call_user_func($beforeSave, $this->instance);
+                $beforeSave($this->instance);
             }
         }
         $this->instance->save();
@@ -222,13 +226,13 @@ class LaraInvite implements InvitationInterface
 
     /**
      * set $this->instance to Junaidnasir\Larainvite\Models\LaraInviteModel instance
-     * @param  boolean $allowNew allow new model
+     * @param boolean $allowNew allow new model
      * @return self
+     * @throws InvalidTokenException
      */
     private function getModelInstance($allowNew = true)
     {
         $model = config('larainvite.InvitationModel');
-        //if (is_null($this->code) && $allowNew) {
         if ($allowNew) {
             $this->instance = new $model;
             return $this;

@@ -70,6 +70,7 @@ interface InvitationInterface
 
     /**
      * check if given token is valid and given email is allowed
+     * @param $email
      * @return boolean
      */
     public function isAllowed($email);

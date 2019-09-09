@@ -2,9 +2,10 @@
 
 namespace Junaidnasir\Larainvite;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class LaraInviteServiceProvider extends ServiceProvider
+class LaraInviteServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Bootstrap the application services.

@@ -112,10 +112,10 @@ $count = $user->invitations()->count();
 
 ***larainvite*** fires several [events](https://laravel.com/docs/master/events)
 
-*  'junaidnasir.larainvite.invited'
-*  'junaidnasir.larainvite.consumed' 
-*  'junaidnasir.larainvite.canceled' 
-*  'junaidnasir.larainvite.expired' 
+*  Junaidnasir\Larainvite\Events\Invited
+*  Junaidnasir\Larainvite\Events\InvitationConsumed
+*  Junaidnasir\Larainvite\Events\InvitedCanceled
+*  Junaidnasir\Larainvite\Events\Expired
 
 all of these events incloses `invitation modal` so you can listen to these events.
 include listener in `EventServiceProvider.php`

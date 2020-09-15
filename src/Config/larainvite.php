@@ -17,7 +17,7 @@ return [
     | User Model
     |--------------------------------------------------------------------------
     */
-    'UserModel' => config('auth.providers.users.model', App\User::class),
+    'UserModel' => config('auth.providers.users.model', App\Models\User::class),
 
     /*
     |--------------------------------------------------------------------------

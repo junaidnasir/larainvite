@@ -1,64 +1,68 @@
-<?php  namespace Junaidnasir\Larainvite;
+<?php
 
-use Exception;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Event;
+namespace Junaidnasir\Larainvite;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Junaidnasir\Larainvite\Events\InvitationCanceled;
+use Junaidnasir\Larainvite\Events\InvitationConsumed;
+use Junaidnasir\Larainvite\Events\InvitationExpired;
+use Junaidnasir\Larainvite\Events\Invited;
 use Junaidnasir\Larainvite\Exceptions\InvalidTokenException;
 
 /**
-*   Laravel Invitation class
-*/
+ *   Laravel Invitation class.
+ */
 class LaraInvite implements InvitationInterface
 {
-
     /**
-     * Email address to invite
+     * Email address to invite.
      * @var string
      */
     private $email;
 
     /**
-     * Referral Code for invitation
+     * Referral Code for invitation.
      * @var string
      */
     private $code = null;
 
     /**
-     * Status of code existing in DB
+     * Status of code existing in DB.
      * @var bool
      */
     private $exist = false;
 
     /**
-     * integer ID of referral
+     * integer ID of referral.
      * @var [type]
      */
     private $referral;
 
     /**
-     * DateTime of referral code expiration
+     * DateTime of referral code expiration.
      * @var DateTime
      */
     private $expires;
 
     /**
-     * Invitation Model
+     * Invitation Model.
      * @var Junaidnasir\Larainvite\Models\LaraInviteModel
      */
     private $instance = null;
-    
+
     /**
      * {@inheritdoc}
      */
     public function invite($email, $referral, $expires, $beforeSave = null)
     {
         $this->readyPayload($email, $referral, $expires)
-             ->createInvite($beforeSave)
-             ->publishEvent('invited');
+             ->createInvite($beforeSave);
+
+        Invited::dispatch($this->instance);
+
         return $this->code;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -71,9 +75,10 @@ class LaraInvite implements InvitationInterface
             // handle invalid codes
             $this->exist = false;
         }
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -90,9 +95,10 @@ class LaraInvite implements InvitationInterface
         if ($this->isValid()) {
             return $this->instance->status;
         }
+
         return 'Invalid';
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -101,12 +107,15 @@ class LaraInvite implements InvitationInterface
         if ($this->isValid()) {
             $this->instance->status = 'successful';
             $this->instance->save();
-            $this->publishEvent('consumed');
+
+            InvitationConsumed::dispatch($this->instance);
+
             return true;
         }
+
         return false;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -115,9 +124,12 @@ class LaraInvite implements InvitationInterface
         if ($this->isValid()) {
             $this->instance->status = 'canceled';
             $this->instance->save();
-            $this->publishEvent('canceled');
+
+            InvitationCanceled::dispatch($this->instance);
+
             return true;
         }
+
         return false;
     }
 
@@ -128,21 +140,21 @@ class LaraInvite implements InvitationInterface
     {
         return $this->exist;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function isValid()
     {
-        return (!$this->isExpired() && $this->isPending());
+        return ! $this->isExpired() && $this->isPending();
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function isExpired()
     {
-        if (!$this->isExisting()) {
+        if (! $this->isExisting()) {
             return true;
         }
         if (strtotime($this->instance->valid_till) >= time()) {
@@ -150,18 +162,21 @@ class LaraInvite implements InvitationInterface
         }
         $this->instance->status = 'expired';
         $this->instance->save();
-        $this->publishEvent('expired');
+
+        InvitationExpired::dispatch($this->instance);
+
         return true;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function isPending()
     {
-        if (!$this->isExisting()) {
+        if (! $this->isExisting()) {
             return false;
         }
+
         return ($this->instance->status === 'pending') ? true : false;
     }
 
@@ -170,21 +185,22 @@ class LaraInvite implements InvitationInterface
      */
     public function isAllowed($email)
     {
-        return ($this->isValid() && ($this->instance->email === $email));
+        return $this->isValid() && ($this->instance->email === $email);
     }
-    
+
     /**
-     * Fire junaidnasir.larainvite.invited again for the invitation
+     * Fire junaidnasir.larainvite.invited again for the invitation.
      * @return true
      */
     public function reminder()
     {
-        Event::dispatch('junaidnasir.larainvite.invited', $this->instance, false);
+        Invited::dispatch($this->instance);
+
         return true;
     }
 
     /**
-     * generate invitation code and call save
+     * generate invitation code and call save.
      * @param null $beforeSave
      * @return self
      * @throws InvalidTokenException
@@ -192,11 +208,12 @@ class LaraInvite implements InvitationInterface
     private function createInvite($beforeSave = null)
     {
         $code = md5(uniqid('', true));
+
         return $this->save($code, $beforeSave);
     }
 
     /**
-     * saves invitation in DB
+     * saves invitation in DB.
      * @param string $code referral code
      * @param null $beforeSave
      * @return self
@@ -205,10 +222,10 @@ class LaraInvite implements InvitationInterface
     private function save($code, $beforeSave = null)
     {
         $this->getModelInstance();
-        $this->instance->email      = $this->email;
-        $this->instance->user_id    = $this->referral;
+        $this->instance->email = $this->email;
+        $this->instance->user_id = $this->referral;
         $this->instance->valid_till = $this->expires;
-        $this->instance->code       = $code;
+        $this->instance->code = $code;
 
         if ($beforeSave !== null) {
             if ($beforeSave instanceof Closure) {
@@ -221,12 +238,13 @@ class LaraInvite implements InvitationInterface
 
         $this->code = $code;
         $this->exist = true;
+
         return $this;
     }
 
     /**
-     * set $this->instance to Junaidnasir\Larainvite\Models\LaraInviteModel instance
-     * @param boolean $allowNew allow new model
+     * set $this->instance to Junaidnasir\Larainvite\Models\LaraInviteModel instance.
+     * @param bool $allowNew allow new model
      * @return self
      * @throws InvalidTokenException
      */
@@ -235,11 +253,13 @@ class LaraInvite implements InvitationInterface
         $model = config('larainvite.InvitationModel');
         if ($allowNew) {
             $this->instance = new $model;
+
             return $this;
         }
         try {
             $this->instance = (new $model)->where('code', $this->code)->firstOrFail();
             $this->exist = true;
+
             return $this;
         } catch (ModelNotFoundException $e) {
             throw new InvalidTokenException("Invalid Token {$this->code}", 401);
@@ -247,28 +267,18 @@ class LaraInvite implements InvitationInterface
     }
 
     /**
-     * set input variables
+     * set input variables.
      * @param  string   $email    email to invite
-     * @param  integer  $referral referral id
+     * @param  int  $referral referral id
      * @param  DateTime $expires  expiration of token
      * @return self
      */
     private function readyPayload($email, $referral, $expires)
     {
-        $this->email    = $email;
+        $this->email = $email;
         $this->referral = $referral;
-        $this->expires  = $expires;
-        return $this;
-    }
+        $this->expires = $expires;
 
-    /**
-     * Fire Laravel event
-     * @param  string $event event name
-     * @return self
-     */
-    private function publishEvent($event)
-    {
-        Event::dispatch('junaidnasir.larainvite.'.$event, $this->instance, false);
         return $this;
     }
 }

@@ -6,6 +6,7 @@ User (signup) invitation package for laravel
 [![Total Downloads](https://poser.pugx.org/junaidnasir/larainvite/downloads)](https://packagist.org/packages/junaidnasir/larainvite)
 [![Monthly Downloads](https://poser.pugx.org/junaidnasir/larainvite/d/monthly)](https://packagist.org/packages/junaidnasir/larainvite)
 
+- v5 support laravel 9
 - v4 support laravel 8
 - v3 support laravel 5.8+, laravel 6.0 and laravel 7.0
 - v2 support laravel 5.0 to 5.8

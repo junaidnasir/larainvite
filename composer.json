@@ -8,15 +8,17 @@
     ],
     "homepage": "https://github.com/junaidnasir/larainvite",
     "license": "MIT",
-    "authors": [{
-        "name": "Junaid Nasir",
-        "email": "contact@junaidnasir.com"
-    }],
+    "authors": [
+        {
+            "name": "Junaid Nasir",
+            "email": "contact@junaidnasir.com"
+        }
+    ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0",
-        "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0",
-        "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0"
+        "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0",
+        "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0",
+        "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0"
     },
     "autoload": {
         "psr-4": {

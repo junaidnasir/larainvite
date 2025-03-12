@@ -8,6 +8,7 @@ It generates a one-time invitation code that can be sent as an invite link, and 
 [![Total Downloads](https://poser.pugx.org/junaidnasir/larainvite/downloads)](https://packagist.org/packages/junaidnasir/larainvite)
 [![Monthly Downloads](https://poser.pugx.org/junaidnasir/larainvite/d/monthly)](https://packagist.org/packages/junaidnasir/larainvite)
 
+- v12 supports Laravel 12
 - v7 supports Laravel 11
 - v6 supports Laravel 10
 - v5 supports Laravel 9
